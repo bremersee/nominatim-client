@@ -16,6 +16,8 @@
 
 package org.bremersee.nominatim.model;
 
+import java.util.List;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,12 +27,15 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
+ * The structured search request.
+ *
  * @author Christian Bremer
  */
 @Getter
 @Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@SuppressWarnings("unused")
 public class StructuredSearchRequest extends AbstractSearchRequest {
 
   private String street;
@@ -43,10 +48,70 @@ public class StructuredSearchRequest extends AbstractSearchRequest {
 
   private String country;
 
-  private String postalcode;
+  private String postalCode;
+
+  /**
+   * Instantiates a new structured search request.
+   */
+  public StructuredSearchRequest() {
+  }
+
+  /**
+   * Instantiates a new structured search request.
+   *
+   * @param acceptLanguage the accept language
+   * @param addressDetails the address details
+   * @param email the email
+   * @param polygon the polygon
+   * @param extraTags the extra tags
+   * @param nameDetails the name details
+   * @param countryCodes the country codes
+   * @param viewBox the view box
+   * @param bounded the bounded
+   * @param excludePlaceIds the exclude place ids
+   * @param limit the limit
+   * @param dedupe the dedupe
+   * @param debug the debug
+   * @param street the street
+   * @param city the city
+   * @param county the county
+   * @param state the state
+   * @param country the country
+   * @param postalCode the postal code
+   */
+  @Builder
+  public StructuredSearchRequest(
+      final String acceptLanguage,
+      final Boolean addressDetails,
+      final String email,
+      final Boolean polygon,
+      final Boolean extraTags,
+      final Boolean nameDetails,
+      final List<String> countryCodes,
+      final Double[] viewBox,
+      final Boolean bounded,
+      final List<String> excludePlaceIds,
+      final Integer limit,
+      final Boolean dedupe,
+      final Boolean debug,
+      final String street,
+      final String city,
+      final String county,
+      final String state,
+      final String country,
+      final String postalCode) {
+    super(acceptLanguage, addressDetails, email, polygon, extraTags, nameDetails, countryCodes,
+        viewBox, bounded, excludePlaceIds, limit, dedupe, debug);
+    this.street = street;
+    this.city = city;
+    this.county = county;
+    this.state = state;
+    this.country = country;
+    this.postalCode = postalCode;
+  }
 
   @Override
-  protected MultiValueMap<String, String> buildSearchParameters(boolean urlEncode) {
+  protected MultiValueMap<String, String> buildSearchParameters(final boolean urlEncode) {
     final MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
     if (StringUtils.hasText(street)) {
       map.set("street", encodeQueryParameter(street, urlEncode));
@@ -63,71 +128,10 @@ public class StructuredSearchRequest extends AbstractSearchRequest {
     if (StringUtils.hasText(country)) {
       map.set("country", encodeQueryParameter(country, urlEncode));
     }
-    if (StringUtils.hasText(postalcode)) {
-      map.set("postalcode", encodeQueryParameter(postalcode, urlEncode));
+    if (StringUtils.hasText(postalCode)) {
+      map.set("postalcode", encodeQueryParameter(postalCode, urlEncode));
     }
     return map;
   }
 
-  public static StructuredSearchRequestBuilder builder() {
-    return new StructuredSearchRequestBuilder();
-  }
-
-  public static class StructuredSearchRequestBuilder extends
-      AbstractSearchRequestBuilder<StructuredSearchRequest> {
-
-    private String street;
-
-    private String city;
-
-    private String county;
-
-    private String state;
-
-    private String country;
-
-    private String postalcode;
-
-    public StructuredSearchRequestBuilder street(String street) {
-      this.street = street;
-      return this;
-    }
-
-    public StructuredSearchRequestBuilder city(String city) {
-      this.city = city;
-      return this;
-    }
-
-    public StructuredSearchRequestBuilder county(String county) {
-      this.county = county;
-      return this;
-    }
-
-    public StructuredSearchRequestBuilder state(String state) {
-      this.state = state;
-      return this;
-    }
-
-    public StructuredSearchRequestBuilder country(String country) {
-      this.country = country;
-      return this;
-    }
-
-    public StructuredSearchRequestBuilder postalcode(String postalcode) {
-      this.postalcode = postalcode;
-      return this;
-    }
-
-    @Override
-    protected StructuredSearchRequest doSearchRequestBuild() {
-      final StructuredSearchRequest searchRequest = new StructuredSearchRequest();
-      searchRequest.setStreet(street);
-      searchRequest.setCity(city);
-      searchRequest.setCounty(county);
-      searchRequest.setState(state);
-      searchRequest.setCountry(country);
-      searchRequest.setPostalcode(postalcode);
-      return searchRequest;
-    }
-  }
 }

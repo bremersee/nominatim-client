@@ -26,6 +26,8 @@ import org.bremersee.geojson.UnknownAware;
 import org.locationtech.jts.geom.Geometry;
 
 /**
+ * The nominatim search result.
+ *
  * @author Christian Bremer
  */
 @Getter

@@ -16,20 +16,47 @@
 
 package org.bremersee.nominatim.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.math.BigDecimal;
 import java.util.List;
+import org.bremersee.geojson.GeoJsonObjectMapperModule;
+import org.bremersee.nominatim.model.ReverseSearchRequest;
 import org.bremersee.nominatim.model.SearchRequest;
 import org.bremersee.nominatim.model.SearchResult;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
+ * Default nominatim client tests.
+ *
  * @author Christian Bremer
  */
 public class DefaultNominatimClientTest {
 
   private static final DefaultNominatimClient client = new DefaultNominatimClient();
 
+  private static ObjectMapper objectMapper;
+
+  /**
+   * Test setup.
+   */
+  @BeforeClass
+  public static void setup() {
+    objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new GeoJsonObjectMapperModule());
+  }
+
   @Test
-  public void testReal() throws Exception {
+  public void testContructor() {
+    Assert.assertNotNull(client.getProperties());
+    Assert.assertNotNull(client.getDefaultObjectMapper());
+  }
+
+  @Ignore
+  @Test
+  public void testRealCall() throws Exception {
     final SearchRequest request = SearchRequest
         .builder()
         .query("Unter den Linden 1, Berlin")
@@ -37,7 +64,33 @@ public class DefaultNominatimClientTest {
 
     List<SearchResult> results = client.geocode(request);
 
-    System.out.println(results);
+    Assert.assertNotNull(results);
+    Assert.assertFalse(results.isEmpty());
+
+    System.out.println("### Search Result #############################");
+    String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(results);
+    System.out.println(json);
+    System.out.println("\n");
+
+    SearchResult sr = results.get(0);
+    Assert.assertTrue(sr.hasLatLon());
+
+    SearchResult reverseResult = client.reverseGeocode(
+        ReverseSearchRequest
+            .builder()
+            .lat(new BigDecimal(sr.getLat()))
+            .lon(new BigDecimal(sr.getLon()))
+            .build());
+
+    Assert.assertNotNull(reverseResult);
+    Assert.assertNotNull(reverseResult.getAddress());
+    Assert.assertNotNull(reverseResult.getAddress().getRoad());
+    Assert.assertEquals("Unter den Linden", reverseResult.getAddress().getRoad());
+
+    System.out.println("### Reverse Result #############################");
+    json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(reverseResult);
+    System.out.println(json);
+    System.out.println("\n");
   }
 
 }

@@ -28,11 +28,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
+ * The abstract request of all other requests.
+ *
  * @author Christian Bremer
  */
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 @EqualsAndHashCode
 public abstract class AbstractRequest {
 
@@ -43,14 +45,14 @@ public abstract class AbstractRequest {
    *
    * <p>Query parameter name is {@code accept-language}.
    */
-  private String acceptLanguage = "de";
+  private String acceptLanguage = "en";
 
   /**
    * Include a breakdown of the address into elements.
    *
    * <p>addressDetails=[0|1]
    */
-  private boolean addressDetails = true;
+  private Boolean addressDetails = Boolean.TRUE;
 
   /**
    * If you are making large numbers of request please include a valid email address or
@@ -67,14 +69,14 @@ public abstract class AbstractRequest {
    *
    * <p>polygon_geojson=1
    */
-  private boolean polygon = true;
+  private Boolean polygon = Boolean.TRUE;
 
   /**
    * Include additional information in the result if available, e.g. wikipedia link, opening hours.
    *
    * <p>extraTags=1
    */
-  private boolean extraTags = true;
+  private Boolean extraTags = Boolean.TRUE;
 
   /**
    * Include a list of alternative names in the results. These may include language variants,
@@ -82,36 +84,83 @@ public abstract class AbstractRequest {
    *
    * <p>nameDetails=1
    */
-  private boolean nameDetails = true;
+  private Boolean nameDetails = Boolean.TRUE;
 
   /**
-   * Build the common request parameter map.
+   * Instantiates a new nbstract request.
+   */
+  AbstractRequest() {
+  }
+
+  /**
+   * Instantiates a new abstract request.
+   *
+   * @param acceptLanguage the accept language
+   * @param addressDetails the address details
+   * @param email the email
+   * @param polygon the polygon
+   * @param extraTags the extra tags
+   * @param nameDetails the name details
+   */
+  AbstractRequest(
+      final String acceptLanguage,
+      final Boolean addressDetails,
+      final String email,
+      final Boolean polygon,
+      final Boolean extraTags,
+      final Boolean nameDetails) {
+    // ensure default values
+    this.acceptLanguage = StringUtils.hasText(acceptLanguage) ? acceptLanguage : "en";
+    this.addressDetails = !Boolean.FALSE.equals(addressDetails);
+    this.email = email;
+    this.polygon = !Boolean.FALSE.equals(polygon);
+    this.extraTags = !Boolean.FALSE.equals(extraTags);
+    this.nameDetails = !Boolean.FALSE.equals(nameDetails);
+  }
+
+  /**
+   * Build the request parameter map.
    *
    * @param urlEncode if {@code true}, the parameter values will be encoded, otherwise not.
-   * @return the common request parameter map
+   * @return the request parameter map
    */
-  public final MultiValueMap<String, String> buildParameters(boolean urlEncode) {
+  public final MultiValueMap<String, String> buildParameters(final boolean urlEncode) {
     final MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
     map.set("format", "jsonv2");
     if (StringUtils.hasText(acceptLanguage)) {
       map.set("accept-language", acceptLanguage);
+    } else {
+      map.set("accept-language", "en");
     }
-    map.set("addressdetails", addressDetails ? "1" : "0");
+    map.set("addressdetails", Boolean.FALSE.equals(addressDetails) ? "0" : "1");
     if (StringUtils.hasText(email)) {
       map.set("email", encodeQueryParameter(email, urlEncode));
     }
-    if (polygon) {
+    if (polygon == null || Boolean.TRUE.equals(polygon)) {
       map.set("polygon_geojson", "1");
     }
-    map.set("extratags", extraTags ? "1" : "0");
-    map.set("namedetails", nameDetails ? "1" : "0");
+    map.set("extratags", Boolean.FALSE.equals(extraTags) ? "0" : "1");
+    map.set("namedetails", Boolean.FALSE.equals(nameDetails) ? "0" : "1");
     map.putAll(buildRequestParameters(urlEncode));
     return map;
   }
 
+  /**
+   * Build request parameters of sub classes.
+   *
+   * @param urlEncode the url encode
+   * @return the multi value map
+   */
   protected abstract MultiValueMap<String, String> buildRequestParameters(boolean urlEncode);
 
-  String encodeQueryParameter(String value, boolean encode) {
+  /**
+   * Encode query parameter.
+   *
+   * @param value the parameter value
+   * @param encode if {@code true} the parameter will be url encoded, otherwise not
+   * @return the (encoded) parameter value
+   */
+  String encodeQueryParameter(final String value, final boolean encode) {
     if (!StringUtils.hasText(value)) {
       return "";
     }
@@ -126,58 +175,4 @@ public abstract class AbstractRequest {
     return value;
   }
 
-  @SuppressWarnings("unused")
-  public static abstract class AbstractRequestBuilder<T extends AbstractRequest> {
-
-    private String acceptLanguage;
-    private boolean addressDetails = true;
-    private String email;
-    private boolean polygon = true;
-    private boolean extraTags = true;
-    private boolean nameDetails = true;
-
-    public AbstractRequestBuilder<T> acceptLanguage(final String acceptLanguage) {
-      this.acceptLanguage = acceptLanguage;
-      return this;
-    }
-
-    public AbstractRequestBuilder<T> addressDetails(final boolean addressDetails) {
-      this.addressDetails = addressDetails;
-      return this;
-    }
-
-    public AbstractRequestBuilder<T> email(final String email) {
-      this.email = email;
-      return this;
-    }
-
-    public AbstractRequestBuilder<T> polygon(final boolean polygon) {
-      this.polygon = polygon;
-      return this;
-    }
-
-    public AbstractRequestBuilder<T> extraTags(final boolean extraTags) {
-      this.extraTags = extraTags;
-      return this;
-    }
-
-    public AbstractRequestBuilder<T> nameDetails(final boolean nameDetails) {
-      this.nameDetails = nameDetails;
-      return this;
-    }
-
-    protected abstract T doRequestBuild();
-
-    public final T build() {
-      T target = doRequestBuild();
-      target.setAcceptLanguage(acceptLanguage);
-      target.setAddressDetails(addressDetails);
-      target.setEmail(email);
-      target.setExtraTags(extraTags);
-      target.setNameDetails(nameDetails);
-      target.setPolygon(polygon);
-      return target;
-    }
-
-  }
 }

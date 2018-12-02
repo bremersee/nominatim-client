@@ -16,17 +16,32 @@
 
 package org.bremersee.nominatim.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.bremersee.geojson.UnknownAware;
 
 /**
+ * The nominatim extra tags response object.
+ *
  * @author Christian Bremer
  */
+@Getter
+@Setter
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
+@SuppressWarnings("WeakerAccess")
 public class ExtraTags extends UnknownAware {
 
-  private String wikidata; // "Q323181"
+  @JsonProperty("wikidata")
+  private String wikiData; // "Q323181"
 
-  private String wikipedia; // "de:Kommandantenhaus (Berlin)"
+  @JsonProperty("wikipedia")
+  private String wikiPedia; // "de:Kommandantenhaus (Berlin)"
 
-  private String wheelchair; // "yes"
+  @JsonProperty("wheelchair")
+  private String wheelChair; // "yes"
 
 }

@@ -25,27 +25,33 @@ import org.bremersee.exception.ServiceException;
 import org.bremersee.geojson.GeoJsonObjectMapperModule;
 import org.bremersee.nominatim.NominatimProperties;
 import org.bremersee.nominatim.exception.ErrorCodeConstants;
+import org.bremersee.nominatim.model.AbstractRequest;
+import org.bremersee.nominatim.model.AbstractReverseSearchRequest;
 import org.bremersee.nominatim.model.AbstractSearchRequest;
-import org.bremersee.nominatim.model.SearchRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.MultiValueMap;
 
 /**
  * Base implementation of a nominatim client.
  *
- * @param <S> the type parameter
- * @param <R> the type parameter
+ * @param <S> the search response return type, e. g. {@literal List<SearchResult>} or {@literal
+ * Flux<SearchResult>}
+ * @param <R> the reverse search response type, e. g. {@literal SearchResult} or {@literal
+ * Mono<SearchResult>}
  * @author Christian Bremer
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class AbstractNominatimClient<S, R> implements NominatimClient<S, R> {
 
   /**
-   * The Default object mapper.
+   * The default object mapper.
    */
   @Getter(AccessLevel.PROTECTED)
   protected final ObjectMapper defaultObjectMapper;
 
+  /**
+   * The nominatim properties.
+   */
   @Getter(AccessLevel.PROTECTED)
   private final NominatimProperties properties;
 
@@ -70,14 +76,24 @@ public abstract class AbstractNominatimClient<S, R> implements NominatimClient<S
   /**
    * Build the search url url.
    *
-   * @param request the request
+   * @param request the search request
    * @return the url
    */
-  protected URL buildSearchUrl(final SearchRequest request) {
+  protected URL buildSearchUrl(final AbstractSearchRequest request) {
     return buildUrl(getProperties().getSearchUri(), request);
   }
 
-  private URL buildUrl(final String baseUri, final AbstractSearchRequest request) {
+  /**
+   * Build the research url.
+   *
+   * @param request the reverse search request
+   * @return the url
+   */
+  protected URL buildReverseSearchUrl(final AbstractReverseSearchRequest request) {
+    return buildUrl(getProperties().getReverseUri(), request);
+  }
+
+  private URL buildUrl(final String baseUri, final AbstractRequest request) {
     boolean baseUriContainsQuery = baseUri.contains("?");
     final StringBuilder urlBuilder = new StringBuilder();
     urlBuilder.append(baseUri);

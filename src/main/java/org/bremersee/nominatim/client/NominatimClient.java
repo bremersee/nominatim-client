@@ -16,16 +16,34 @@
 
 package org.bremersee.nominatim.client;
 
-import org.bremersee.nominatim.model.ReverseSearchRequest;
-import org.bremersee.nominatim.model.SearchRequest;
+import org.bremersee.nominatim.model.AbstractReverseSearchRequest;
+import org.bremersee.nominatim.model.AbstractSearchRequest;
 
 /**
+ * General nominatim client interface.
+ *
+ * @param <S> the search response return type, e. g. {@literal List<SearchResult>} or {@literal
+ * Flux<SearchResult>}
+ * @param <R> the reverse search response type, e. g. {@literal SearchResult} or {@literal
+ * Mono<SearchResult>}
  * @author Christian Bremer
  */
 public interface NominatimClient<S, R> {
 
-  S geocode(SearchRequest request);
+  /**
+   * Makes a geocode search request.
+   *
+   * @param request the request
+   * @return the response
+   */
+  S geocode(AbstractSearchRequest request);
 
-  R reverseGeocode(ReverseSearchRequest request);
+  /**
+   * Makes a reverse geocode search request.
+   *
+   * @param request the request
+   * @return the response
+   */
+  R reverseGeocode(AbstractReverseSearchRequest request);
 
 }

@@ -24,12 +24,15 @@ import lombok.ToString;
 import org.bremersee.geojson.UnknownAware;
 
 /**
+ * Nominatim address response object.
+ *
  * @author Christian Bremer
  */
 @Getter
 @Setter
 @ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
+@SuppressWarnings("WeakerAccess")
 public class Address extends UnknownAware {
 
   private String address26;

@@ -27,12 +27,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
+ * The abstract search request.
+ *
  * @author Christian Bremer
  */
-@Getter
-@Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@SuppressWarnings("unused")
 public abstract class AbstractSearchRequest extends AbstractRequest {
 
   /**
@@ -41,12 +42,15 @@ public abstract class AbstractSearchRequest extends AbstractRequest {
    *
    * <p>countrycodes={@literal <countrycode>[,<countrycode>][,<countrycode>]} ...
    */
-  private List<String> countryCodes = new ArrayList<>();
+  @Setter
+  private List<String> countryCodes;
 
   /**
    * The preferred area to find search results. Any two corner points of the box are accepted in any
    * order as long as they span a real box.
    */
+  @Getter
+  @Setter
   private Double[] viewBox;
 
   /**
@@ -57,7 +61,9 @@ public abstract class AbstractSearchRequest extends AbstractRequest {
    *
    * <p>bounded=[0|1]
    */
-  private boolean bounded = false;
+  @Getter
+  @Setter
+  private Boolean bounded = Boolean.FALSE;
 
   /**
    * If you do not want certain openstreetmap objects to appear in the search result, give a comma
@@ -67,14 +73,17 @@ public abstract class AbstractSearchRequest extends AbstractRequest {
    *
    * <p>exclude_place_ids={@literal <place_id,[place_id],[place_id]>}
    */
-  private List<String> excludePlaceIds = new ArrayList<>();
+  @Setter
+  private List<String> excludePlaceIds;
 
   /**
    * Limit the number of returned results. Default is 10.
    *
    * <p>limit={@literal <integer>}
    */
-  private int limit = 10;
+  @Getter
+  @Setter
+  private Integer limit = 10;
 
   /**
    * Sometimes you have several objects in OSM identifying the same place or object in reality. The
@@ -86,7 +95,9 @@ public abstract class AbstractSearchRequest extends AbstractRequest {
    *
    * <p>dedupe=[0|1]
    */
-  private boolean dedupe = true;
+  @Getter
+  @Setter
+  private Boolean dedupe = Boolean.TRUE;
 
   /**
    * Output assorted developer debug information. Data on internals of nominatim "Search Loop"
@@ -95,9 +106,87 @@ public abstract class AbstractSearchRequest extends AbstractRequest {
    *
    * <p>debug=[0|1]
    */
-  private boolean debug = false;
+  @Getter
+  @Setter
+  private Boolean debug = Boolean.FALSE;
 
-  public final MultiValueMap<String, String> buildRequestParameters(boolean urlEncode) {
+  /**
+   * Instantiates a new abstract search request.
+   */
+  AbstractSearchRequest() {
+  }
+
+  /**
+   * Instantiates a new abstract search request.
+   *
+   * @param acceptLanguage the accept language
+   * @param addressDetails the address details
+   * @param email the email
+   * @param polygon the polygon
+   * @param extraTags the extra tags
+   * @param nameDetails the name details
+   * @param countryCodes the country codes
+   * @param viewBox the view box
+   * @param bounded the bounded
+   * @param excludePlaceIds the exclude place ids
+   * @param limit the limit
+   * @param dedupe the dedupe
+   * @param debug the debug
+   */
+  AbstractSearchRequest(
+      final String acceptLanguage,
+      final Boolean addressDetails,
+      final String email,
+      final Boolean polygon,
+      final Boolean extraTags,
+      final Boolean nameDetails,
+      final List<String> countryCodes,
+      final Double[] viewBox,
+      final Boolean bounded,
+      final List<String> excludePlaceIds,
+      final Integer limit,
+      final Boolean dedupe,
+      final Boolean debug) {
+    super(acceptLanguage, addressDetails, email, polygon, extraTags, nameDetails);
+    this.countryCodes = countryCodes;
+    this.viewBox = viewBox;
+    this.bounded = Boolean.TRUE.equals(bounded);
+    this.excludePlaceIds = excludePlaceIds;
+    this.limit = limit == null || limit < 1 ? 10 : limit;
+    this.dedupe = !Boolean.FALSE.equals(dedupe);
+    this.debug = Boolean.TRUE.equals(debug);
+  }
+
+  /**
+   * Limit search results to a specific country (or a list of countries). {@literal <countrycode>}
+   * should be the ISO 3166-1alpha2 code, e.g. gb for the United Kingdom, de for Germany, etc.
+   *
+   * @return the country codes
+   */
+  public List<String> getCountryCodes() {
+    if (countryCodes == null) {
+      countryCodes = new ArrayList<>();
+    }
+    return countryCodes;
+  }
+
+  /**
+   * If you do not want certain openstreetmap objects to appear in the search result, give a comma
+   * separated list of the place_id's you want to skip. This can be used to broaden search results.
+   * For example, if a previous query only returned a few results, then including those here would
+   * cause the search to return other, less accurate, matches (if possible).
+   *
+   * @return the excluded place IDs
+   */
+  public List<String> getExcludePlaceIds() {
+    if (excludePlaceIds == null) {
+      excludePlaceIds = new ArrayList<>();
+    }
+    return excludePlaceIds;
+  }
+
+  @Override
+  protected final MultiValueMap<String, String> buildRequestParameters(final boolean urlEncode) {
     final MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
     if (countryCodes != null && !countryCodes.isEmpty()) {
       map.set("countrycodes", StringUtils.collectionToCommaDelimitedString(countryCodes));
@@ -105,86 +194,25 @@ public abstract class AbstractSearchRequest extends AbstractRequest {
     if (viewBox != null && viewBox.length == 4) {
       map.set("viewbox", StringUtils.arrayToCommaDelimitedString(viewBox));
     }
-    map.set("bounded", bounded ? "1" : "0");
+    map.set("bounded", Boolean.TRUE.equals(bounded) ? "1" : "0");
     if (excludePlaceIds != null && !excludePlaceIds.isEmpty()) {
       map.set("exclude_place_ids",
           encodeQueryParameter(
               StringUtils.collectionToCommaDelimitedString(excludePlaceIds), urlEncode));
     }
-    map.set("limit", limit < 1 ? "10" : String.valueOf(limit));
-    map.set("dedupe", dedupe ? "1" : "0");
-    map.set("debug", debug ? "1" : "0");
+    map.set("limit", limit == null || limit < 1 ? "10" : String.valueOf(limit));
+    map.set("dedupe", Boolean.FALSE.equals(dedupe) ? "0" : "1");
+    map.set("debug", Boolean.TRUE.equals(debug) ? "1" : "0");
     map.putAll(buildSearchParameters(urlEncode));
     return map;
   }
 
+  /**
+   * Build search parameters.
+   *
+   * @param urlEncode the url encode
+   * @return the search parameters
+   */
   protected abstract MultiValueMap<String, String> buildSearchParameters(boolean urlEncode);
-
-  @SuppressWarnings("unused")
-  public static abstract class AbstractSearchRequestBuilder<T extends AbstractSearchRequest>
-      extends AbstractRequestBuilder<T> {
-
-    private List<String> countryCodes = new ArrayList<>();
-    private Double[] viewBox;
-    private boolean bounded;
-    private List<String> excludePlaceIds = new ArrayList<>();
-    private int limit = 10;
-    private boolean dedupe = true;
-    private boolean debug = false;
-
-    public AbstractSearchRequestBuilder<T> countryCodes(final List<String> countryCodes) {
-      if (countryCodes != null) {
-        this.countryCodes = countryCodes;
-      }
-      return this;
-    }
-
-    public AbstractSearchRequestBuilder<T> viewBox(final Double[] viewBox) {
-      this.viewBox = viewBox;
-      return this;
-    }
-
-    public AbstractSearchRequestBuilder<T> bounded(final boolean bounded) {
-      this.bounded = bounded;
-      return this;
-    }
-
-    public AbstractSearchRequestBuilder<T> excludePlaceIds(final List<String> excludePlaceIds) {
-      if (excludePlaceIds != null) {
-        this.excludePlaceIds = excludePlaceIds;
-      }
-      return this;
-    }
-
-    public AbstractSearchRequestBuilder<T> limit(final int limit) {
-      this.limit = limit;
-      return this;
-    }
-
-    public AbstractSearchRequestBuilder<T> dedupe(final boolean dedupe) {
-      this.dedupe = dedupe;
-      return this;
-    }
-
-    public AbstractSearchRequestBuilder<T> debug(final boolean debug) {
-      this.debug = debug;
-      return this;
-    }
-
-    protected abstract T doSearchRequestBuild();
-
-    public final T doRequestBuild() {
-      T target = doSearchRequestBuild();
-      target.setBounded(bounded);
-      target.setCountryCodes(countryCodes);
-      target.setViewBox(viewBox);
-      target.setDebug(debug);
-      target.setDedupe(dedupe);
-      target.setExcludePlaceIds(excludePlaceIds);
-      target.setLimit(limit);
-      return target;
-    }
-
-  }
 
 }

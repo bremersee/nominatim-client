@@ -17,6 +17,7 @@
 package org.bremersee.nominatim.model;
 
 import java.math.BigDecimal;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,55 +26,62 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /**
+ * The reverse search request.
+ *
  * @author Christian Bremer
  */
+@Getter
+@Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@SuppressWarnings("unused")
 public class ReverseSearchRequest extends AbstractReverseSearchRequest {
 
-  @Getter
-  @Setter
   private BigDecimal lat;
 
-  @Getter
-  @Setter
   private BigDecimal lon;
 
+  /**
+   * Instantiates a new reverse search request.
+   */
+  public ReverseSearchRequest() {
+  }
+
+  /**
+   * Instantiates a new reverse search request.
+   *
+   * @param acceptLanguage the accept language
+   * @param addressDetails the address details
+   * @param email the email
+   * @param polygon the polygon
+   * @param extraTags the extra tags
+   * @param nameDetails the name details
+   * @param zoom the zoom
+   * @param lat the lat
+   * @param lon the lon
+   */
+  @Builder
+  public ReverseSearchRequest(
+      final String acceptLanguage,
+      final Boolean addressDetails,
+      final String email,
+      final Boolean polygon,
+      final Boolean extraTags,
+      final Boolean nameDetails,
+      final Integer zoom,
+      final BigDecimal lat,
+      final BigDecimal lon) {
+    super(acceptLanguage, addressDetails, email, polygon, extraTags, nameDetails, zoom);
+    this.lat = lat;
+    this.lon = lon;
+  }
+
   @Override
-  protected MultiValueMap<String, String> buildReverseSearchParameters(boolean urlEncode) {
+  protected MultiValueMap<String, String> buildReverseSearchParameters(final boolean urlEncode) {
     final MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
     map.set("lat", lat != null ? String.valueOf(lat) : "0");
     map.set("lon", lon != null ? String.valueOf(lon) : "0");
     return map;
   }
 
-  public static ReverseSearchRequestBuilder builder() {
-    return new ReverseSearchRequestBuilder();
-  }
-
-  public static class ReverseSearchRequestBuilder
-      extends AbstractReverseSearchRequestBuilder<ReverseSearchRequest> {
-
-    private BigDecimal lat;
-    private BigDecimal lon;
-
-    public ReverseSearchRequestBuilder lat(BigDecimal lat) {
-      this.lat = lat;
-      return this;
-    }
-
-    public ReverseSearchRequestBuilder lon(BigDecimal lon) {
-      this.lon = lon;
-      return this;
-    }
-
-    @Override
-    protected ReverseSearchRequest doReverseSearchRequestBuild() {
-      ReverseSearchRequest target = new ReverseSearchRequest();
-      target.setLon(lon);
-      target.setLat(lat);
-      return target;
-    }
-
-  }
 }

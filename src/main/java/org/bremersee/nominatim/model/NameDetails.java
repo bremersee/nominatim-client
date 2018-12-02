@@ -17,11 +17,20 @@
 package org.bremersee.nominatim.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.bremersee.geojson.UnknownAware;
 
 /**
  * @author Christian Bremer
  */
+@Getter
+@Setter
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
+@SuppressWarnings("WeakerAccess")
 public class NameDetails extends UnknownAware {
 
   @JsonProperty("name")

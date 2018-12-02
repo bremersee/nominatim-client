@@ -16,14 +16,19 @@
 
 package org.bremersee.nominatim.client;
 
-import org.bremersee.nominatim.model.ReverseSearchResult;
 import org.bremersee.nominatim.model.SearchResult;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
+ * Reactive nominatim client interface.
+ *
+ * @param <S> the search response return type ({@literal Flux<SearchResult>})
+ * @param <R> the reverse search response type ({@literal Mono<SearchResult>})
  * @author Christian Bremer
  */
+@SuppressWarnings("WeakerAccess")
 public interface ReactiveNominatimClient<S extends Flux<? extends SearchResult>,
-    R extends Flux<? extends ReverseSearchResult>> extends NominatimClient<S, R> {
+    R extends Mono<? extends SearchResult>> extends NominatimClient<S, R> {
 
 }

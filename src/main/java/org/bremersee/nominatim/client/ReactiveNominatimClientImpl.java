@@ -17,9 +17,8 @@
 package org.bremersee.nominatim.client;
 
 import org.bremersee.nominatim.NominatimProperties;
-import org.bremersee.nominatim.model.ReverseSearchRequest;
-import org.bremersee.nominatim.model.ReverseSearchResult;
-import org.bremersee.nominatim.model.SearchRequest;
+import org.bremersee.nominatim.model.AbstractReverseSearchRequest;
+import org.bremersee.nominatim.model.AbstractSearchRequest;
 import org.bremersee.nominatim.model.SearchResult;
 import org.bremersee.web.ErrorDetectors;
 import org.bremersee.web.reactive.function.client.DefaultWebClientErrorDecoder;
@@ -28,31 +27,53 @@ import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
+ * The reactive nominatim client implementation.
+ *
  * @author Christian Bremer
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class ReactiveNominatimClientImpl
-    extends AbstractNominatimClient<Flux<SearchResult>, Flux<ReverseSearchResult>>
-    implements ReactiveNominatimClient<Flux<SearchResult>, Flux<ReverseSearchResult>> {
+    extends AbstractNominatimClient<Flux<SearchResult>, Mono<SearchResult>>
+    implements ReactiveNominatimClient<Flux<SearchResult>, Mono<SearchResult>> {
 
   private WebClient.Builder webClientBuilder;
 
   private WebClientErrorDecoder<? extends Throwable> webClientErrorDecoder;
 
+  /**
+   * Instantiates a new reactive nominatim client.
+   */
   public ReactiveNominatimClientImpl() {
     this(null, null);
   }
 
+  /**
+   * Instantiates a new reactive nominatim client.
+   *
+   * @param webClientBuilder the web client builder
+   */
   public ReactiveNominatimClientImpl(WebClient.Builder webClientBuilder) {
     this(null, webClientBuilder);
   }
 
+  /**
+   * Instantiates a new reactive nominatim client.
+   *
+   * @param properties the properties
+   */
   public ReactiveNominatimClientImpl(NominatimProperties properties) {
     this(properties, null);
   }
 
+  /**
+   * Instantiates a new reactive nominatim client.
+   *
+   * @param properties the properties
+   * @param webClientBuilder the web client builder
+   */
   public ReactiveNominatimClientImpl(
       NominatimProperties properties,
       WebClient.Builder webClientBuilder) {
@@ -64,14 +85,17 @@ public class ReactiveNominatimClientImpl
             .exchangeStrategies(
                 ExchangeStrategies
                     .builder()
-                    .codecs((clientCodecConfigurer -> {
-                      clientCodecConfigurer
-                          .defaultCodecs()
-                          .jackson2JsonDecoder(new Jackson2JsonDecoder(getDefaultObjectMapper()));
-                    }))
+                    .codecs((clientCodecConfigurer -> clientCodecConfigurer
+                        .defaultCodecs()
+                        .jackson2JsonDecoder(new Jackson2JsonDecoder(getDefaultObjectMapper()))))
                     .build());
   }
 
+  /**
+   * Gets web client error decoder.
+   *
+   * @return the web client error decoder
+   */
   protected WebClientErrorDecoder<? extends Throwable> getWebClientErrorDecoder() {
     if (webClientErrorDecoder == null) {
       webClientErrorDecoder = new DefaultWebClientErrorDecoder();
@@ -79,26 +103,40 @@ public class ReactiveNominatimClientImpl
     return webClientErrorDecoder;
   }
 
+  /**
+   * Sets web client error decoder.
+   *
+   * @param webClientErrorDecoder the web client error decoder
+   */
   public void setWebClientErrorDecoder(
       final WebClientErrorDecoder<? extends Throwable> webClientErrorDecoder) {
     this.webClientErrorDecoder = webClientErrorDecoder;
   }
 
   @Override
-  public Flux<SearchResult> geocode(final SearchRequest request) {
+  public Flux<SearchResult> geocode(final AbstractSearchRequest request) {
     return webClientBuilder
         .baseUrl(getProperties().getSearchUri())
         .build()
         .get()
         .uri(uriBuilder -> uriBuilder.queryParams(request.buildParameters(true)).build())
+        .header("User-Agent", getProperties().getUserAgent())
         .retrieve()
         .onStatus(ErrorDetectors.DEFAULT, getWebClientErrorDecoder())
         .bodyToFlux(SearchResult.class);
   }
 
   @Override
-  public Flux<ReverseSearchResult> reverseGeocode(ReverseSearchRequest request) {
-    return null;
+  public Mono<SearchResult> reverseGeocode(AbstractReverseSearchRequest request) {
+    return webClientBuilder
+        .baseUrl(getProperties().getReverseUri())
+        .build()
+        .get()
+        .uri(uriBuilder -> uriBuilder.queryParams(request.buildParameters(true)).build())
+        .header("User-Agent", getProperties().getUserAgent())
+        .retrieve()
+        .onStatus(ErrorDetectors.DEFAULT, getWebClientErrorDecoder())
+        .bodyToMono(SearchResult.class);
   }
 
 }

@@ -17,14 +17,17 @@
 package org.bremersee.nominatim.client;
 
 import java.util.List;
-import org.bremersee.nominatim.model.ReverseSearchResult;
 import org.bremersee.nominatim.model.SearchResult;
-import reactor.core.publisher.Flux;
 
 /**
+ * The traditional nominatim client interface.
+ *
+ * @param <S> the search response ({@literal List<? extends SearchResult>})
+ * @param <R> the reverse search response ({@literal SearchResult})
  * @author Christian Bremer
  */
+@SuppressWarnings("WeakerAccess")
 public interface TraditionalNominatimClient<S extends List<? extends SearchResult>,
-    R extends List<? extends ReverseSearchResult>> extends NominatimClient<S, R> {
+    R extends SearchResult> extends NominatimClient<S, R> {
 
 }

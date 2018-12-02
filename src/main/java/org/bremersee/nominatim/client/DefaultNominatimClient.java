@@ -17,7 +17,11 @@
 package org.bremersee.nominatim.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -25,48 +29,71 @@ import org.bremersee.exception.ServiceException;
 import org.bremersee.geojson.GeoJsonObjectMapperModule;
 import org.bremersee.nominatim.NominatimProperties;
 import org.bremersee.nominatim.exception.ErrorCodeConstants;
-import org.bremersee.nominatim.model.ReverseSearchRequest;
-import org.bremersee.nominatim.model.ReverseSearchResult;
-import org.bremersee.nominatim.model.SearchRequest;
+import org.bremersee.nominatim.model.AbstractReverseSearchRequest;
+import org.bremersee.nominatim.model.AbstractSearchRequest;
 import org.bremersee.nominatim.model.SearchResult;
-import org.springframework.http.HttpStatus;
+import org.springframework.util.FileCopyUtils;
 
 /**
+ * Default nominatim client that uses {@link URL#openConnection()}.
+ *
  * @author Christian Bremer
  */
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class DefaultNominatimClient
-    extends AbstractNominatimClient<List<SearchResult>, List<ReverseSearchResult>>
-    implements TraditionalNominatimClient<List<SearchResult>, List<ReverseSearchResult>> {
+    extends AbstractNominatimClient<List<SearchResult>, SearchResult>
+    implements TraditionalNominatimClient<List<SearchResult>, SearchResult> {
 
-  private ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
+  /**
+   * Instantiates a new default nominatim client.
+   */
   public DefaultNominatimClient() {
     this(null, null);
   }
 
-  public DefaultNominatimClient(ObjectMapper objectMapper) {
+  /**
+   * Instantiates a new default nominatim client.
+   *
+   * @param objectMapper the object mapper (can be {@code null} - a default one will be used then)
+   */
+  public DefaultNominatimClient(final ObjectMapper objectMapper) {
     this(null, objectMapper);
   }
 
-  public DefaultNominatimClient(NominatimProperties properties) {
+  /**
+   * Instantiates a new default nominatim client.
+   *
+   * @param properties the properties
+   */
+  public DefaultNominatimClient(final NominatimProperties properties) {
     this(properties, null);
   }
 
-  public DefaultNominatimClient(NominatimProperties properties, ObjectMapper objectMapper) {
+  /**
+   * Instantiates a new default nominatim client.
+   *
+   * @param properties the properties
+   * @param objectMapper the object mapper (can be {@code null} - a default one will be used then)
+   */
+  public DefaultNominatimClient(
+      final NominatimProperties properties,
+      final ObjectMapper objectMapper) {
+
     super(properties);
-    this.objectMapper = objectMapper != null ? objectMapper : new ObjectMapper();
+    if (objectMapper == null) {
+      this.objectMapper = new ObjectMapper();
+    } else {
+      this.objectMapper = objectMapper;
+    }
     this.objectMapper.registerModule(new GeoJsonObjectMapperModule());
   }
 
-  public List<SearchResult> geocode(final SearchRequest request) {
+  @Override
+  public List<SearchResult> geocode(final AbstractSearchRequest request) {
     final URL url = buildSearchUrl(request);
-    final SearchResult[] resultArray;
-    try {
-      resultArray = objectMapper.readValue(url, SearchResult[].class);
-    } catch (final Exception e) {
-      throw new ServiceException(
-          HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodeConstants.GENERAL_REQUEST_ERROR, e);
-    }
+    final SearchResult[] resultArray = call(url, SearchResult[].class);
     if (resultArray == null) {
       return Collections.emptyList();
     }
@@ -74,8 +101,47 @@ public class DefaultNominatimClient
   }
 
   @Override
-  public List<ReverseSearchResult> reverseGeocode(ReverseSearchRequest request) {
-    return Collections.emptyList();
+  public SearchResult reverseGeocode(final AbstractReverseSearchRequest request) {
+    final URL url = buildReverseSearchUrl(request);
+    return call(url, SearchResult.class);
+  }
+
+  private <T> T call(final URL url, final Class<T> responseClass) {
+    HttpURLConnection con = null;
+    try {
+      con = (HttpURLConnection) url.openConnection();
+      con.setRequestProperty("User-Agent", getProperties().getUserAgent());
+      con.connect();
+      int statusCode = con.getResponseCode();
+      if (statusCode >= 400) {
+        try (InputStream errorStream = con.getErrorStream()) {
+          final String body = new String(
+              FileCopyUtils.copyToByteArray(errorStream), StandardCharsets.UTF_8);
+          throw new ServiceException(statusCode, body, ErrorCodeConstants.GENERAL_REQUEST_ERROR);
+
+        } catch (IOException e) {
+          throw new ServiceException(
+              statusCode,
+              "Reading error stream failed.",
+              ErrorCodeConstants.GENERAL_REQUEST_ERROR,
+              e);
+        }
+      }
+      try (InputStream inputStream = con.getInputStream()) {
+        return objectMapper.readValue(inputStream, responseClass);
+
+      } catch (IOException e) {
+        throw new ServiceException(
+            500, "Reading input stream failed.", ErrorCodeConstants.GENERAL_REQUEST_ERROR, e);
+      }
+    } catch (IOException e) {
+      throw new ServiceException(
+          500, "Connecting to " + url + " failed.", ErrorCodeConstants.GENERAL_REQUEST_ERROR, e);
+    } finally {
+      if (con != null) {
+        con.disconnect();
+      }
+    }
   }
 
 }

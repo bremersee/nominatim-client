@@ -17,12 +17,20 @@
 package org.bremersee.nominatim.exception;
 
 /**
+ * Error codes of this client library.
+ *
  * @author Christian Bremer
  */
 public abstract class ErrorCodeConstants {
 
+  /**
+   * Bad URL code.
+   */
   public static final String MALFORMED_URL = "NOMINATIM_CLIENT:MALFORMED_URL";
 
+  /**
+   * Request error code.
+   */
   public static final String GENERAL_REQUEST_ERROR = "NOMINATIM_CLIENT:GENERAL_REQUEST_ERROR";
 
   private ErrorCodeConstants() {

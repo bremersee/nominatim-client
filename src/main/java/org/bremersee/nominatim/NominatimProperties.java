@@ -16,12 +16,19 @@
 
 package org.bremersee.nominatim;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
+ * The nominatim properties.
+ *
  * @author Christian Bremer
  */
+@ToString
+@EqualsAndHashCode
+@SuppressWarnings("WeakerAccess")
 public class NominatimProperties {
 
   public static final String DEFAULT_SEARCH_URI = "https://nominatim.openstreetmap.org/search";
@@ -35,5 +42,9 @@ public class NominatimProperties {
   @Getter
   @Setter
   private String reverseUri = DEFAULT_REVERSE_URI;
+
+  @Getter
+  @Setter
+  private String userAgent = "curl/7.54.0";
 
 }
