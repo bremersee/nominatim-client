@@ -21,7 +21,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.bremersee.geojson.UnknownAware;
+import org.bremersee.plain.model.UnknownAware;
 
 /**
  * The nominatim extra tags response object.

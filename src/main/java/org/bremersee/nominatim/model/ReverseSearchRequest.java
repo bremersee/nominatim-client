@@ -79,8 +79,8 @@ public class ReverseSearchRequest extends AbstractReverseSearchRequest {
   @Override
   protected MultiValueMap<String, String> buildReverseSearchParameters(final boolean urlEncode) {
     final MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-    map.set("lat", lat != null ? String.valueOf(lat) : "0");
-    map.set("lon", lon != null ? String.valueOf(lon) : "0");
+    map.set("lat", lat != null ? lat.toPlainString() : "0");
+    map.set("lon", lon != null ? lon.toPlainString() : "0");
     return map;
   }
 
