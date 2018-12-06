@@ -17,6 +17,9 @@
 package org.bremersee.nominatim.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -84,6 +87,10 @@ public class DefaultNominatimClient
     super(properties);
     if (objectMapper == null) {
       this.objectMapper = new ObjectMapper();
+      this.objectMapper.registerModules(
+          new Jdk8Module(),
+          new JavaTimeModule(),
+          new ParameterNamesModule());
     } else {
       this.objectMapper = objectMapper;
     }

@@ -17,6 +17,9 @@
 package org.bremersee.nominatim.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import java.math.BigDecimal;
 import java.util.List;
 import org.bremersee.geojson.GeoJsonObjectMapperModule;
@@ -45,7 +48,11 @@ public class DefaultNominatimClientTest {
   @BeforeClass
   public static void setup() {
     objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new GeoJsonObjectMapperModule());
+    objectMapper.registerModules(
+        new Jdk8Module(),
+        new JavaTimeModule(),
+        new ParameterNamesModule(),
+        new GeoJsonObjectMapperModule());
   }
 
   @Test
