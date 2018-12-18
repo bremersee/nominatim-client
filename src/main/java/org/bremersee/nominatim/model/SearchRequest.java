@@ -17,6 +17,7 @@
 package org.bremersee.nominatim.model;
 
 import java.util.List;
+import java.util.Locale;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -72,8 +73,8 @@ public class SearchRequest extends AbstractSearchRequest {
       final Boolean polygon,
       final Boolean extraTags,
       final Boolean nameDetails,
-      final List<String> countryCodes,
-      final Double[] viewBox,
+      final List<Locale> countryCodes,
+      final double[] viewBox,
       final Boolean bounded,
       final List<String> excludePlaceIds,
       final Integer limit,

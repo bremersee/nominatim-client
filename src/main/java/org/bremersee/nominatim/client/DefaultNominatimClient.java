@@ -45,7 +45,7 @@ import org.springframework.util.FileCopyUtils;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class DefaultNominatimClient
     extends AbstractNominatimClient<List<SearchResult>, SearchResult>
-    implements TraditionalNominatimClient<List<SearchResult>, SearchResult> {
+    implements TraditionalNominatimClient {
 
   private final ObjectMapper objectMapper;
 

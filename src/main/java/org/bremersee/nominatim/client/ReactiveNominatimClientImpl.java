@@ -37,7 +37,7 @@ import reactor.core.publisher.Mono;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class ReactiveNominatimClientImpl
     extends AbstractNominatimClient<Flux<SearchResult>, Mono<SearchResult>>
-    implements ReactiveNominatimClient<Flux<SearchResult>, Mono<SearchResult>> {
+    implements ReactiveNominatimClient {
 
   private WebClient.Builder webClientBuilder;
 

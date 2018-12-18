@@ -22,12 +22,10 @@ import org.bremersee.nominatim.model.SearchResult;
 /**
  * The traditional nominatim client interface.
  *
- * @param <S> the search response ({@literal List<? extends SearchResult>})
- * @param <R> the reverse search response ({@literal SearchResult})
  * @author Christian Bremer
  */
 @SuppressWarnings("WeakerAccess")
-public interface TraditionalNominatimClient<S extends List<? extends SearchResult>,
-    R extends SearchResult> extends NominatimClient<S, R> {
+public interface TraditionalNominatimClient
+    extends NominatimClient<List<SearchResult>, SearchResult> {
 
 }

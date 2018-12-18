@@ -39,7 +39,7 @@ public class SearchResult extends UnknownAware {
   private Address address;
 
   @JsonProperty("boundingbox")
-  private Double[] boundingBox;
+  private double[] boundingBox;
 
   private String category;
 

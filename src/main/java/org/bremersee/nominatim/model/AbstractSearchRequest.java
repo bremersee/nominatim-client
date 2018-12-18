@@ -18,6 +18,9 @@ package org.bremersee.nominatim.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,7 +46,7 @@ public abstract class AbstractSearchRequest extends AbstractRequest {
    * <p>countrycodes={@literal <countrycode>[,<countrycode>][,<countrycode>]} ...
    */
   @Setter
-  private List<String> countryCodes;
+  private List<Locale> countryCodes;
 
   /**
    * The preferred area to find search results. Any two corner points of the box are accepted in any
@@ -51,7 +54,7 @@ public abstract class AbstractSearchRequest extends AbstractRequest {
    */
   @Getter
   @Setter
-  private Double[] viewBox;
+  private double[] viewBox;
 
   /**
    * Restrict the results to only items contained with the viewBox (see above). Restricting the
@@ -140,8 +143,8 @@ public abstract class AbstractSearchRequest extends AbstractRequest {
       final Boolean polygon,
       final Boolean extraTags,
       final Boolean nameDetails,
-      final List<String> countryCodes,
-      final Double[] viewBox,
+      final List<Locale> countryCodes,
+      final double[] viewBox,
       final Boolean bounded,
       final List<String> excludePlaceIds,
       final Integer limit,
@@ -163,7 +166,7 @@ public abstract class AbstractSearchRequest extends AbstractRequest {
    *
    * @return the country codes
    */
-  public List<String> getCountryCodes() {
+  public List<Locale> getCountryCodes() {
     if (countryCodes == null) {
       countryCodes = new ArrayList<>();
     }
@@ -189,10 +192,15 @@ public abstract class AbstractSearchRequest extends AbstractRequest {
   protected final MultiValueMap<String, String> buildRequestParameters(final boolean urlEncode) {
     final MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
     if (countryCodes != null && !countryCodes.isEmpty()) {
-      map.set("countrycodes", StringUtils.collectionToCommaDelimitedString(countryCodes));
+      map.set("countrycodes", StringUtils.collectionToCommaDelimitedString(
+          countryCodes
+              .stream()
+              .map(Locale::getCountry)
+              .filter(Objects::nonNull)
+              .collect(Collectors.toSet())));
     }
     if (viewBox != null && viewBox.length == 4) {
-      map.set("viewbox", StringUtils.arrayToCommaDelimitedString(viewBox));
+      map.set("viewbox", viewBox[0] + "," + viewBox[1] + "," + viewBox[2] + "," + viewBox[3]);
     }
     map.set("bounded", Boolean.TRUE.equals(bounded) ? "1" : "0");
     if (excludePlaceIds != null && !excludePlaceIds.isEmpty()) {
