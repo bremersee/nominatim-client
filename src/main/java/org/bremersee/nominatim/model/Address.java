@@ -16,6 +16,7 @@
 
 package org.bremersee.nominatim.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,7 +33,6 @@ import org.bremersee.plain.model.UnknownAware;
 @Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = false)
-@SuppressWarnings("WeakerAccess")
 public class Address extends UnknownAware {
 
   private String address26;
@@ -57,6 +57,9 @@ public class Address extends UnknownAware {
   @JsonProperty("country")
   private String country; // "Deutschland",
 
+  @JsonProperty("county")
+  private String county; // "Landkreis Peine",
+
   @JsonProperty("country_code")
   private String countryCode; // "de",
 
@@ -73,12 +76,68 @@ public class Address extends UnknownAware {
   private String publicBuilding; // "Kommandantenhaus",
 
   @JsonProperty("state")
-  private String state; // "Berlin",
+  private String state; // "Berlin", "Lower Saxony"
 
   @JsonProperty("suburb")
-  private String suburb; // "Mitte"
+  private String suburb; // "Mitte", "Dechsendorf"
+
+  @JsonProperty("town")
+  private String town; // "Peine"
 
   @JsonProperty("tram_stop")
   private String tramStop;
+
+  @JsonProperty("village")
+  private String village;
+
+  /**
+   * Find the city, town or village.
+   *
+   * @return the city, town or village (can be {@code null})
+   */
+  public String findCity() {
+    return city != null ? city : town != null ? town : village;
+  }
+
+  /**
+   * Get the country code.
+   *
+   * @return the country code (can be {@code null})
+   */
+  public String getCountryCode() {
+    return countryCode != null ? countryCode.toUpperCase() : null;
+  }
+
+  /**
+   * Get the formatted address.
+   *
+   * @return the formatted address (can be {@code null})
+   */
+  @JsonIgnore
+  public String getFormattedAddress() {
+    final StringBuilder sb = new StringBuilder(buildStreet());
+    final String city = findCity();
+    if (city != null) {
+      if (sb.length() > 0) {
+        sb.append(", ");
+      }
+      sb.append(city);
+    }
+    final String country = getCountry();
+    if (country != null) {
+      if (sb.length() > 0) {
+        sb.append(", ");
+      }
+      sb.append(country);
+    }
+    return sb.length() > 0 ? sb.toString() : null;
+  }
+
+  private String buildStreet() {
+    if (road == null) {
+      return "";
+    }
+    return road + (houseNumber != null ? " " + houseNumber : "");
+  }
 
 }

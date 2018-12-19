@@ -21,7 +21,9 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import org.bremersee.geojson.GeoJsonObjectMapperModule;
 import org.bremersee.nominatim.model.ReverseSearchRequest;
 import org.bremersee.nominatim.model.SearchRequest;
@@ -56,7 +58,7 @@ public class DefaultNominatimClientTest {
   }
 
   @Test
-  public void testContructor() {
+  public void testConstructor() {
     Assert.assertNotNull(client.getProperties());
     Assert.assertNotNull(client.getDefaultObjectMapper());
   }
@@ -67,6 +69,9 @@ public class DefaultNominatimClientTest {
     final SearchRequest request = SearchRequest
         .builder()
         .query("Unter den Linden 1, Berlin")
+        //.query("35 Route de Pont Audemer, 27260 Cormeilles")
+        .countryCodes(Collections.singletonList(Locale.GERMANY))
+        //.countryCodes(Collections.singletonList(Locale.FRANCE))
         .build();
 
     List<SearchResult> results = client.geocode(request);
@@ -93,6 +98,13 @@ public class DefaultNominatimClientTest {
     Assert.assertNotNull(reverseResult.getAddress());
     Assert.assertNotNull(reverseResult.getAddress().getRoad());
     Assert.assertEquals("Unter den Linden", reverseResult.getAddress().getRoad());
+    Assert.assertNotNull(reverseResult.getAddress().findCity());
+    Assert.assertEquals("Berlin", reverseResult.getAddress().findCity());
+    Assert.assertNotNull(reverseResult.getAddress().getCountryCode());
+    Assert.assertEquals("DE", reverseResult.getAddress().getCountryCode());
+    Assert.assertNotNull(reverseResult.getAddress().getFormattedAddress());
+    Assert.assertTrue(reverseResult.getAddress().getFormattedAddress()
+        .contains(reverseResult.getAddress().getCountry()));
 
     System.out.println("### Reverse Result #############################");
     json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(reverseResult);
