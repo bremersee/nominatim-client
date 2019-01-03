@@ -58,11 +58,11 @@ public abstract class AbstractReverseSearchRequest extends AbstractRequest {
    *
    * @param acceptLanguage the accept language
    * @param addressDetails the address details
-   * @param email the email
-   * @param polygon the polygon
-   * @param extraTags the extra tags
-   * @param nameDetails the name details
-   * @param zoom the zoom
+   * @param email          the email
+   * @param polygon        the polygon
+   * @param extraTags      the extra tags
+   * @param nameDetails    the name details
+   * @param zoom           the zoom
    */
   AbstractReverseSearchRequest(
       final String acceptLanguage,

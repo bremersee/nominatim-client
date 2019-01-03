@@ -103,9 +103,10 @@ public class SearchResult extends UnknownAware {
    * Returns lat as double.
    *
    * @return lat as double
-   * @throws NullPointerException if lat is null
+   * @throws NullPointerException  if lat is null
    * @throws NumberFormatException if lat is not a number
    */
+  @SuppressWarnings("unused")
   public double latToDouble() {
     return Double.parseDouble(lat);
   }
@@ -114,9 +115,10 @@ public class SearchResult extends UnknownAware {
    * Returns lon as double.
    *
    * @return lon as double
-   * @throws NullPointerException if lon is null
+   * @throws NullPointerException  if lon is null
    * @throws NumberFormatException if lon is not a number
    */
+  @SuppressWarnings("unused")
   public double lonToDouble() {
     return Double.parseDouble(lon);
   }

@@ -60,25 +60,25 @@ public class StructuredSearchRequest extends AbstractSearchRequest {
   /**
    * Instantiates a new structured search request.
    *
-   * @param acceptLanguage the accept language
-   * @param addressDetails the address details
-   * @param email the email
-   * @param polygon the polygon
-   * @param extraTags the extra tags
-   * @param nameDetails the name details
-   * @param countryCodes the country codes
-   * @param viewBox the view box
-   * @param bounded the bounded
+   * @param acceptLanguage  the accept language
+   * @param addressDetails  the address details
+   * @param email           the email
+   * @param polygon         the polygon
+   * @param extraTags       the extra tags
+   * @param nameDetails     the name details
+   * @param countryCodes    the country codes
+   * @param viewBox         the view box
+   * @param bounded         the bounded
    * @param excludePlaceIds the exclude place ids
-   * @param limit the limit
-   * @param dedupe the dedupe
-   * @param debug the debug
-   * @param street the street
-   * @param city the city
-   * @param county the county
-   * @param state the state
-   * @param country the country
-   * @param postalCode the postal code
+   * @param limit           the limit
+   * @param dedupe          the dedupe
+   * @param debug           the debug
+   * @param street          the street
+   * @param city            the city
+   * @param county          the county
+   * @param state           the state
+   * @param country         the country
+   * @param postalCode      the postal code
    */
   @Builder
   public StructuredSearchRequest(

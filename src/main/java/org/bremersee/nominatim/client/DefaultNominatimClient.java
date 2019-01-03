@@ -77,7 +77,7 @@ public class DefaultNominatimClient
   /**
    * Instantiates a new default nominatim client.
    *
-   * @param properties the properties
+   * @param properties   the properties
    * @param objectMapper the object mapper (can be {@code null} - a default one will be used then)
    */
   public DefaultNominatimClient(

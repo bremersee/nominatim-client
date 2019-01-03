@@ -71,7 +71,7 @@ public class ReactiveNominatimClientImpl
   /**
    * Instantiates a new reactive nominatim client.
    *
-   * @param properties the properties
+   * @param properties       the properties
    * @param webClientBuilder the web client builder
    */
   public ReactiveNominatimClientImpl(

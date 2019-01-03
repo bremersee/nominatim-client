@@ -122,19 +122,19 @@ public abstract class AbstractSearchRequest extends AbstractRequest {
   /**
    * Instantiates a new abstract search request.
    *
-   * @param acceptLanguage the accept language
-   * @param addressDetails the address details
-   * @param email the email
-   * @param polygon the polygon
-   * @param extraTags the extra tags
-   * @param nameDetails the name details
-   * @param countryCodes the country codes
-   * @param viewBox the view box
-   * @param bounded the bounded
+   * @param acceptLanguage  the accept language
+   * @param addressDetails  the address details
+   * @param email           the email
+   * @param polygon         the polygon
+   * @param extraTags       the extra tags
+   * @param nameDetails     the name details
+   * @param countryCodes    the country codes
+   * @param viewBox         the view box
+   * @param bounded         the bounded
    * @param excludePlaceIds the exclude place ids
-   * @param limit the limit
-   * @param dedupe the dedupe
-   * @param debug the debug
+   * @param limit           the limit
+   * @param dedupe          the dedupe
+   * @param debug           the debug
    */
   AbstractSearchRequest(
       final String acceptLanguage,

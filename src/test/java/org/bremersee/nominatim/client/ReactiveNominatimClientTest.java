@@ -50,12 +50,20 @@ public class ReactiveNominatimClientTest {
     objectMapper.registerModule(new GeoJsonObjectMapperModule());
   }
 
+  /**
+   * Test contructor.
+   */
   @Test
   public void testContructor() {
     Assert.assertNotNull(client.getProperties());
     Assert.assertNotNull(client.getDefaultObjectMapper());
   }
 
+  /**
+   * Test real call.
+   *
+   * @throws Exception the exception
+   */
   @Ignore
   @Test
   public void testRealCall() throws Exception {

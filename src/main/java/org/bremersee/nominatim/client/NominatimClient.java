@@ -23,9 +23,9 @@ import org.bremersee.nominatim.model.AbstractSearchRequest;
  * General nominatim client interface.
  *
  * @param <S> the search response return type, e. g. {@literal List<SearchResult>} or {@literal
- * Flux<SearchResult>}
+ *            Flux<SearchResult>}
  * @param <R> the reverse search response type, e. g. {@literal SearchResult} or {@literal
- * Mono<SearchResult>}
+ *            Mono<SearchResult>}
  * @author Christian Bremer
  */
 public interface NominatimClient<S, R> {

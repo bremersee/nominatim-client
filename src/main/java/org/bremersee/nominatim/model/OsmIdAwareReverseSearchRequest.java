@@ -52,13 +52,13 @@ public class OsmIdAwareReverseSearchRequest extends AbstractReverseSearchRequest
    *
    * @param acceptLanguage the accept language
    * @param addressDetails the address details
-   * @param email the email
-   * @param polygon the polygon
-   * @param extraTags the extra tags
-   * @param nameDetails the name details
-   * @param zoom the zoom
-   * @param osmType the osm type
-   * @param osmId the osm id
+   * @param email          the email
+   * @param polygon        the polygon
+   * @param extraTags      the extra tags
+   * @param nameDetails    the name details
+   * @param zoom           the zoom
+   * @param osmType        the osm type
+   * @param osmId          the osm id
    */
   @Builder
   public OsmIdAwareReverseSearchRequest(

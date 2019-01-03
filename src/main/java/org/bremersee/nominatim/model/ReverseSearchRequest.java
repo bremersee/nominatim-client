@@ -52,13 +52,13 @@ public class ReverseSearchRequest extends AbstractReverseSearchRequest {
    *
    * @param acceptLanguage the accept language
    * @param addressDetails the address details
-   * @param email the email
-   * @param polygon the polygon
-   * @param extraTags the extra tags
-   * @param nameDetails the name details
-   * @param zoom the zoom
-   * @param lat the lat
-   * @param lon the lon
+   * @param email          the email
+   * @param polygon        the polygon
+   * @param extraTags      the extra tags
+   * @param nameDetails    the name details
+   * @param zoom           the zoom
+   * @param lat            the lat
+   * @param lon            the lon
    */
   @Builder
   public ReverseSearchRequest(

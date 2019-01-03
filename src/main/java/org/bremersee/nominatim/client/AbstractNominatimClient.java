@@ -35,9 +35,9 @@ import org.springframework.util.MultiValueMap;
  * Base implementation of a nominatim client.
  *
  * @param <S> the search response return type, e. g. {@literal List<SearchResult>} or {@literal
- * Flux<SearchResult>}
+ *            Flux<SearchResult>}
  * @param <R> the reverse search response type, e. g. {@literal SearchResult} or {@literal
- * Mono<SearchResult>}
+ *            Mono<SearchResult>}
  * @author Christian Bremer
  */
 @SuppressWarnings({"unused", "WeakerAccess"})

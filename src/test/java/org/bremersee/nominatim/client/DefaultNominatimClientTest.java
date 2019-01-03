@@ -57,12 +57,20 @@ public class DefaultNominatimClientTest {
         new GeoJsonObjectMapperModule());
   }
 
+  /**
+   * Test constructor.
+   */
   @Test
   public void testConstructor() {
     Assert.assertNotNull(client.getProperties());
     Assert.assertNotNull(client.getDefaultObjectMapper());
   }
 
+  /**
+   * Test real call.
+   *
+   * @throws Exception the exception
+   */
   @Ignore
   @Test
   public void testRealCall() throws Exception {
