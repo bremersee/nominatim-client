@@ -86,7 +86,7 @@
     <site>
       <id>bremersee-sites</id>
       <url>
-        dav:https://nexus.bremersee.org/repository/maven-sites/nominatim-client
+        dav:https://nexus.bremersee.org/repository/maven-sites/nominatim-client/${project.version}
       </url>
     </site>
   </distributionManagement>
