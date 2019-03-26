@@ -11,6 +11,7 @@
 
   <name>nominatim-client</name>
   <description>Nominatim Geocoding Client</description>
+  <url>https://github.com/bremersee/nominatim-client</url>
 
   <properties>
     <github.global.server>github</github.global.server>
